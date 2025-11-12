@@ -102,7 +102,7 @@ void gerarArquivoItensVendidos(Pedido *pedido) {
 
 int processarPagamento(float valorTotal, float *pagoCliente, float *troco) {
     int tipoPagamento;
-    char trocoSN;
+    char trocoSN, confirmado;
 
     do {
         printf("Qual será a forma de pagamento:\n(1) PIX\n(2) Cartão de Crédito/Débito\n(3) Dinheiro \n");
@@ -112,9 +112,28 @@ int processarPagamento(float valorTotal, float *pagoCliente, float *troco) {
         switch (tipoPagamento) {
             case 1:
                 printf("\nGere o código na maquininha\n");
+                printf("O cliente realizou o pagamento por pix? <s/n>");
+                scanf(" %c", &confirmado);
+
+                if(confirmado == 's'|| confirmado == 'S'){
+                    return 1;
+                } else{
+                    return 0;
+                }
+
                 break;
             case 2:
                 printf("\nSelecione crédito ou débito na maquininha, e peça para o cliente inserir ou aproximar o cartão na maquininha\n");
+
+                printf("O cliente realizou o pagamento por cartão? <s/n>");
+                scanf(" %c", &confirmado);
+
+                if(confirmado == 's'|| confirmado == 'S'){
+                    return 1;
+                } else{
+                    return 0;
+                }
+
                 break;
             case 3:
                 printf("\nAbra a caixa registradora e receba o dinheiro do cliente!\n");
@@ -242,15 +261,8 @@ void registrarPedido() {
             return;
         } 
         
-        // Atualiza o estoque
-        if (!atualizarEstoquePedido(&pedido)){
-            free(pedido.produto);
-            return;
-        }
-
-        // Processamento e gravação
+        //Exibe total e processa o pagamento
         printf("\nTotal: R$ %.2f\n", pedido.valorTotal);
-    
         if (!processarPagamento(pedido.valorTotal, &pagoCliente, &troco)) {
             printf("\nPagamento não concluído. Pedido cancelado.\n");
             free(pedido.produto);
@@ -258,6 +270,13 @@ void registrarPedido() {
         }
 
 
+        // Atualiza o estoque
+        if (!atualizarEstoquePedido(&pedido)){
+            free(pedido.produto);
+            return;
+        }
+       
+        // Gera arquivos e confirma o pedido
         pedido.id = gerarProximoIDPedido();
         gerarArquivoPedidos(pedido.id, pedido.cpf, pedido.quantidadeProdutos, pedido.valorTotal);
         gerarArquivoItensVendidos(&pedido);
