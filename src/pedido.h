@@ -23,8 +23,8 @@ FILE* abrirArquivosPedidos(int modo);
 void registrarPedido();
 void gerarArquivoPedidos(int id, const char *cpf, int qtdProdutos, float total);
 void gerarArquivoItensVendidos(Pedido *pedido);
-void processarPagamento(float valorTotal, float *pagoCliente, float *troco);
 
+int processarPagamento(float valorTotal, float *pagoCliente, float *troco);
 int gerarProximoIDPedido();
 int verificarProdutosPedido(Pedido *pedido);
 int atualizarEstoquePedido(Pedido *pedido);
