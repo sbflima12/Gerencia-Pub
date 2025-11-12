@@ -62,27 +62,24 @@ void cadastrarCliente() {
 }
 
 float calcularValorGasto(const char* buscaCpf) {
-    
     FILE *arqPedido = abrirArquivosPedidos(1);
     if (arqPedido == NULL) {
         printf("\nErro ao abrir o arquivo pedidos.txt para identificar o valor total gasto!\n");
         return 0.0;
     }
 
-    char cpfPedido[20];
-    float valorGasto; 
-    float valorTotalGasto = 0.0; 
+    int id, qtdProdutos;
+    char cpfPedido[20], data[20];
+    float valorGasto, valorTotalGasto = 0.0;
 
-
-
-    while(fscanf(arqPedido, "%d;%[^;];%[^;];%*d;%f\n", cpfPedido, &valorGasto) != EOF) {
-        if(strcmp(buscaCpf, cpfPedido) == 0) {
+    // leitura no formato exato do arquivo
+    while (fscanf(arqPedido, "%d;%[^;];%[^;];%d;%f\n", &id, cpfPedido, data, &qtdProdutos, &valorGasto) == 5) {
+        if (strcmp(buscaCpf, cpfPedido) == 0) {
             valorTotalGasto += valorGasto;
         }
     }
 
     fclose(arqPedido);
-    
     return valorTotalGasto;
 }
 
