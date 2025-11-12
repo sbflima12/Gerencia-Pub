@@ -99,7 +99,8 @@ void gerarArquivoItensVendidos(Pedido *pedido) {
     fclose(arquivo);
 }
 
-void processarPagamento(float valorTotal, float *pagoCliente, float *troco) {
+
+int processarPagamento(float valorTotal, float *pagoCliente, float *troco) {
     int tipoPagamento;
     char trocoSN;
 
@@ -128,9 +129,10 @@ void processarPagamento(float valorTotal, float *pagoCliente, float *troco) {
 
                     if (*troco < 0) {
                         printf("\nO valor fornecido é insuficiente! Falta R$%.2f\n", -*troco);
-                        *troco = 0; 
+                        return 0; 
                     } else {
                         printf("\nDevolva o troco de R$%.2f ao cliente\n", *troco);
+                        return 1; 
                     }
                 }
                 break;
@@ -248,7 +250,13 @@ void registrarPedido() {
 
         // Processamento e gravação
         printf("\nTotal: R$ %.2f\n", pedido.valorTotal);
-        processarPagamento(pedido.valorTotal, &pagoCliente, &troco);
+    
+        if (!processarPagamento(pedido.valorTotal, &pagoCliente, &troco)) {
+            printf("\nPagamento não concluído. Pedido cancelado.\n");
+            free(pedido.produto);
+            return;
+        }
+
 
         pedido.id = gerarProximoIDPedido();
         gerarArquivoPedidos(pedido.id, pedido.cpf, pedido.quantidadeProdutos, pedido.valorTotal);
