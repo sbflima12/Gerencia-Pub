@@ -546,7 +546,7 @@ void menuConsultarProdutos() {
     int opcao;
     do {
         printf("\n--- MENU CONSULTA PRODUTOS ---\n");
-        printf("1. Listar todos\n2. Listar bebidas\n3. Listar comidas\n4. Consultar por código\n0. Voltar\nEscolha: ");
+        printf("(1) Listar todos\n(2) Listar bebidas\n(3) Listar comidas\n(4) Consultar por código \n(0) Voltar\nEscolha: ");
         scanf("%d", &opcao);
 
         switch (opcao) {
