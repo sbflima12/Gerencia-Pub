@@ -6,19 +6,27 @@
 #include "estoque.h"
 #include "pedido.h"
 
-typedef struct {
-    char nome[50];
-    char cpf[20];
-    char telefone[15];
-    char email[100];
-}Cliente;
-
 FILE* abrirArquivoClientes(int modo) {
     FILE *arquivo = NULL;
 
     switch (modo) {
-        case 1: arquivo = fopen("clientes.txt", "r"); break;
-        case 2: arquivo = fopen("clientes.txt", "a"); break;
+        case 1:
+            arquivo = fopen("clientes.txt", "r");
+            if (arquivo == NULL) {
+                arquivo = fopen("clientes.txt", "w");
+                if (arquivo == NULL) {
+                    printf("Erro ao criar o arquivo de clientes.\n");
+                    return NULL;
+                }
+                fclose(arquivo);
+                arquivo = fopen("clientes.txt", "r");
+            }
+            break;
+
+        case 2:
+            arquivo = fopen("clientes.txt", "a");
+            break;
+
         default:
             printf("Modo de abertura inválido para clientes.\n");
             return NULL;
@@ -30,18 +38,44 @@ FILE* abrirArquivoClientes(int modo) {
     return arquivo;
 }
 
+int verificarCliente(Cliente c) {
+    FILE *arqCliente = abrirArquivoClientes(1);
+    if (arqCliente == NULL)
+        return 1;
+
+    char linha[256], cpfCadastrado[20];
+    while (fgets(linha, sizeof(linha), arqCliente)) {
+        if (sscanf(linha, "%*[^;];%19[^;];%*[^;];%*[^\n]", cpfCadastrado) == 1) {
+            cpfCadastrado[strcspn(cpfCadastrado, "\r\n")] = '\0';
+            if (strcmp(cpfCadastrado, c.cpf) == 0) {
+                fclose(arqCliente);
+                return 0;
+            }
+        }
+    }
+
+    fclose(arqCliente);
+    return 1;
+}
+
+
 void cadastrarCliente() {
     
     Cliente c;
     
     printf("\n--------Cadastro de Cliente--------\n");
     
-    printf("Digite o nome completo:");
-    scanf(" %[^\n]", c.nome);
-    
     printf("Digite o CPF:");
     scanf("%s", c.cpf);
-    
+
+    if(verificarCliente(c) == 0){
+        printf("Cliente já cadastrado!\n");
+        return;
+    }
+
+    printf("Digite o nome completo:");
+    scanf(" %[^\n]", c.nome);
+
     printf("Digite o telefone:");
     scanf(" %s", c.telefone);
     
@@ -73,7 +107,7 @@ float calcularValorGasto(const char* buscaCpf) {
     float valorGasto, valorTotalGasto = 0.0;
 
     // leitura no formato exato do arquivo
-    while (fscanf(arqPedido, "%d;%[^;];%[^;];%d;%f\n", &id, cpfPedido, data, &qtdProdutos, &valorGasto) == 5) {
+    while (fscanf(arqPedido, "%*d;%[^;];%*[^;];%*d;%f\n", cpfPedido, &valorGasto) == 2) {
         if (strcmp(buscaCpf, cpfPedido) == 0) {
             valorTotalGasto += valorGasto;
         }
